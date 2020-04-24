@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="wGa-MM-WnJ">
+    <device id="retina6_1" orientation="landscape" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Home View Controller-->
+        <scene sceneID="4nC-yt-Sf0">
+            <objects>
+                <viewController storyboardIdentifier="HomeViewController" id="wGa-MM-WnJ" customClass="HomeViewController" customModule="ColorTrap" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="kPz-e5-P88">
+                        <rect key="frame" x="0.0" y="0.0" width="896" height="414"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8Em-qL-gMk">
+                                <rect key="frame" x="60" y="171.5" width="776" height="50"/>
+                                <color key="backgroundColor" red="0.0" green="0.60784313729999995" blue="0.90588235289999997" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="rLl-vf-tYg"/>
+                                </constraints>
+                                <state key="normal" title="Start The Game">
+                                    <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="8Em-qL-gMk" firstAttribute="leading" secondItem="jVs-OW-OJJ" secondAttribute="leading" constant="16" id="hX0-Cs-2Dd"/>
+                            <constraint firstItem="8Em-qL-gMk" firstAttribute="centerX" secondItem="jVs-OW-OJJ" secondAttribute="centerX" id="p8c-bu-g5l"/>
+                            <constraint firstItem="8Em-qL-gMk" firstAttribute="centerY" secondItem="jVs-OW-OJJ" secondAttribute="centerY" id="yJQ-bP-qfc"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="jVs-OW-OJJ"/>
+                    </view>
+                    <connections>
+                        <outlet property="startGameButton" destination="8Em-qL-gMk" id="iok-2Q-Lil"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="PfR-wm-61o" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="187" y="134"/>
+        </scene>
+    </scenes>
+</document>
