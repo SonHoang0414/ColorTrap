@@ -50,9 +50,12 @@ class HomeModule: Module {
                 let homeViewController = resolver.resolve(HomeViewController.self)
             else { return }
 
-            let playViewController = self.getController(of: PlayViewController.self, in: self.parent!.playModule)
             modalCoordinator.homeViewController = homeViewController
-            modalCoordinator.getPlayViewController = { return playViewController }
+            modalCoordinator.getPlayViewController = { [weak self] in
+                guard let self = self, let parent = self.parent else { return nil }
+                let playViewController = self.getController(of: PlayViewController.self, in: parent.playModule)
+                return playViewController
+            }
             
         }
         
