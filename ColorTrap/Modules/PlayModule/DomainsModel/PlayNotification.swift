@@ -44,7 +44,7 @@ class RPPlayNotification: PlayNotification {
                     return state
                 }
                 return .initial
-        }.debug("ReceiveNotification", trimOutput: true)
+        }
     }
     
     func renewQuestion() -> Observable<Void> {

@@ -51,6 +51,10 @@ class RPPlayAction: PlayAction {
         
         service.state()
             .filter { $0 == .gameOver }
+            .do(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                self.service.stopCountDown()
+            })
             .map { _ in }
             .bind(to: store.gameOver)
             .disposed(by: disposeBag)
