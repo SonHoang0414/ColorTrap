@@ -14,7 +14,7 @@ protocol GameController {
 
     var notification: GameNotification { get }
     var dataSource: GameDataSource { get }
-
+    
 }
 
 class RPGameController: GameController {
@@ -28,36 +28,14 @@ class RPGameController: GameController {
         self.notification = notification
         self.dataSource = dataSource
         
-        notification.start()
-            .subscribe(onNext: { rect in
-                dataSource.startGame()
-            }).disposed(by: disposeBag)
-        
-        notification.restart()
-            .subscribe(onNext: { _ in
-                dataSource.restart()
-            }).disposed(by: disposeBag)
-        
-        notification.didAnswer()
-            .subscribe(onNext: { isCorrect in
-                dataSource.answer(isCorrect: isCorrect)
-            }).disposed(by: disposeBag)
-        
-        notification.renewQuestion()
-            .subscribe(onNext: { _ in
-                dataSource.nextQuestion()
-            }).disposed(by: disposeBag)
-        
-        dataSource.stateChangeOutPut
+        notification.state()
+            .bind(to: dataSource.state)
+            .disposed(by: disposeBag)
+
+        dataSource.stateOutput
             .subscribe(onNext: { [weak self] state in
                 guard let self = self else { return }
                 self.change(gameState: state)
-            }).disposed(by: disposeBag)
-        
-        dataSource.questionOutPut
-            .subscribe(onNext: { [weak self] question in
-                guard let self = self else { return }
-                self.generate(question: question)
             }).disposed(by: disposeBag)
         
         dataSource.lifeCountOutPut
@@ -75,11 +53,6 @@ class RPGameController: GameController {
     
     private func change(gameState state: GameState) {
         notification.change(gameState: state)
-            .subscribe().dispose()
-    }
-    
-    private func generate(question: Question) {
-        notification.generate(question: question)
             .subscribe().dispose()
     }
     

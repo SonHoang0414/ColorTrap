@@ -11,56 +11,32 @@ import RxSwift
 import RxCocoa
 
 protocol PlayNotification {
-    
-    func start() -> Observable<Void>
+        
+    func change(GameStateTo newState: GameState) -> Observable<Void>
     
     func state() -> Observable<GameState>
-    
-    func question() -> Observable<Question?>
-    
-    func renewQuestion() -> Observable<Void>
-    
-    func didAnswer(isCorrect: Bool) -> Observable<Void>
     
     func totalScore() -> Observable<Int>
     
     func lifeCount() -> Observable<Int>
-    
-    func restart() -> Observable<Void>
         
 }
 
 class RPPlayNotification: PlayNotification {
     
-    func start() -> Observable<Void> {
-        NotificationCenter.default.post(name: .PlayGame, object: self)
+    func change(GameStateTo newState: GameState) -> Observable<Void> {
+        NotificationCenter.default.post(name: .HomeModuleState, object: self, userInfo: [kHomeModuleState: newState])
         return .empty()
     }
     
     func state() -> Observable<GameState> {
-        return NotificationCenter.default.rx.notification(.GameState)
+        return NotificationCenter.default.rx.notification(.GameModuleState)
             .map { notification -> GameState in
-                if let state = notification.userInfo?[kGameState] as? GameState {
+                if let state = notification.userInfo?[kGameModuleState] as? GameState {
                     return state
                 }
                 return .initial
         }
-    }
-    
-    func renewQuestion() -> Observable<Void> {
-        NotificationCenter.default.post(name: .RenewQuestion, object: self)
-        return .empty()
-    }
-    
-    func question() -> Observable<Question?> {
-        return NotificationCenter.default.rx.notification(.Question).map { notification -> Question? in
-            return notification.userInfo?[kQuestion] as? RPQuestion
-        }
-    }
-    
-    func didAnswer(isCorrect: Bool) -> Observable<Void> {
-        NotificationCenter.default.post(name: .UserAnswer, object: self, userInfo: [kUserAnswer: isCorrect])
-        return .empty()
     }
     
     func totalScore() -> Observable<Int> {
@@ -81,11 +57,6 @@ class RPPlayNotification: PlayNotification {
             }
             return 0
         }
-    }
-    
-    func restart() -> Observable<Void> {
-        NotificationCenter.default.post(name: .RestartGame, object: self)
-        return .empty()
     }
     
 }

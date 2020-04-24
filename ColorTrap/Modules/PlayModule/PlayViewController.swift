@@ -99,10 +99,6 @@ extension PlayViewController {
     
     private func bindingOtherAction() {
         quitGameButton.rx.tap
-            .do(onNext: { [weak self] _ in
-                guard let self = self else { return }
-                self.action.didRestart.execute()
-            })
             .bind(to: rx.dismissWithoutCompletion)
             .disposed(by: disposeBag)
         

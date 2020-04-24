@@ -14,22 +14,14 @@ protocol PlayService {
     
     var notification: PlayNotification { get }
     var timer: PlayTimer { get }
-    
-    func start() -> Observable<Void>
+        
+    func change(GameStateTo newState: GameState) -> Observable<Void>
     
     func state() -> Observable<GameState>
-    
-    func question() -> Observable<Question?>
-    
-    func renewQuestion() -> Observable<Void>
-    
-    func didAnswer(isCorrect: Bool) -> Observable<Void>
-    
+
     func totalScore() -> Observable<Int>
     
     func lifeCount() -> Observable<Int>
-    
-    func restart() -> Observable<Void>
         
     func timerValue() -> Observable<Double>
     
@@ -43,8 +35,8 @@ protocol PlayService {
 
 class RPPlayservice: PlayService {
     
-    let notification: PlayNotification
-    let timer: PlayTimer
+    internal let notification: PlayNotification
+    internal let timer: PlayTimer
     
     init(notification: PlayNotification, timer: PlayTimer) {
         self.notification = notification
@@ -53,24 +45,12 @@ class RPPlayservice: PlayService {
     
     // MARK: - Notification
     
-    func start() -> Observable<Void> {
-        return notification.start()
+    func change(GameStateTo newState: GameState) -> Observable<Void> {
+        return notification.change(GameStateTo: newState)
     }
     
     func state() -> Observable<GameState> {
         return notification.state()
-    }
-    
-    func question() -> Observable<Question?> {
-        return notification.question()
-    }
-    
-    func renewQuestion() -> Observable<Void> {
-        return notification.renewQuestion()
-    }
-    
-    func didAnswer(isCorrect: Bool) -> Observable<Void> {
-        return notification.didAnswer(isCorrect: isCorrect)
     }
     
     func totalScore() -> Observable<Int> {
@@ -79,10 +59,6 @@ class RPPlayservice: PlayService {
     
     func lifeCount() -> Observable<Int> {
         return notification.lifeCount()
-    }
-    
-    func restart() -> Observable<Void> {
-        return notification.restart()
     }
     
     // MARK: - Timer

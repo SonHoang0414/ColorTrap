@@ -13,40 +13,31 @@ import RxCocoa
 
 protocol GameDataSource {
     
-    var state: GameState { get }
+    var state: BehaviorRelay<GameState> { get }
     var score: Int { get }
     var lifeCount: Int { get }
     var level: Level { get }
     
-    var stateChangeOutPut: Observable<GameState> { get }
+    var stateOutput: Observable<GameState> { get }
     var questionOutPut: Observable<RPQuestion> { get }
     var scoreOutPut: Observable<Int> { get }
     var lifeCountOutPut: Observable<Int> { get }
     
-    func startGame()
-    func restart()
-    func gameOver()
-    func nextQuestion()
-    func answer(isCorrect: Bool)
+    func initialGame()
+    
+    func handle(GameState state: GameState)
 }
 
 class RPGameDataSource: GameDataSource {
     
-    var state: GameState = .initial {
-        didSet {
-            if state == .initial {
-                score = 0
-                lifeCount = 4
-            }
-            scoreRelay.accept(score)
-            lifeCountRelay.accept(lifeCount)
-        }
-    }
+    private let disposeBag = DisposeBag()
+    
+    var state = BehaviorRelay<GameState>(value: .initial)
     
     var lifeCount: Int = 4 {
         didSet {
             if lifeCount == 0 {
-                gameOver()
+                stateOutputRelay.accept(.gameOver)
             }
         }
     }
@@ -54,46 +45,66 @@ class RPGameDataSource: GameDataSource {
     var score: Int = 0
     var level: Level = .easy
     
-    private let stateChangeRelay = PublishRelay<GameState>()
+    private let stateOutputRelay = PublishRelay<GameState>()
     private let questionRelay = PublishRelay<RPQuestion>()
     private let scoreRelay = PublishRelay<Int>()
     private let lifeCountRelay = PublishRelay<Int>()
     
-    lazy var stateChangeOutPut: Observable<GameState> = { return stateChangeRelay.asObservable() }()
+    lazy var stateOutput: Observable<GameState> = { return stateOutputRelay.asObservable() }()
     lazy var questionOutPut: Observable<RPQuestion> = { return questionRelay.asObservable() }()
     lazy var scoreOutPut: Observable<Int> = { return scoreRelay.asObservable() }()
     lazy var lifeCountOutPut: Observable<Int> = { return lifeCountRelay.asObservable() }()
+    
+    
+    init() {
+        state.subscribe(onNext: { [weak self] state in
+                guard let self = self else { return }
+                self.handle(GameState: state)
+            }).disposed(by: disposeBag)
+    }
     
 }
 
 // MARK: - Functions
 extension RPGameDataSource {
-
-    func startGame() {
-        change(toNewState: .playing)
-        nextQuestion()
+    
+    internal func handle(GameState state: GameState) {
+        switch state {
+        case .initial:
+            initialGame()
+        case .playing, .nextQuestion, .renewQuestion:
+            initialGame()
+            generateQuestion()
+        case .didAnswer(isCorrect: let isCorrect):
+            answer(isCorrect: isCorrect)
+        case .restart:
+            initialGame()
+            generateQuestion()
+        default: break
+        }
     }
     
-    func restart() {
-        change(toNewState: .initial)
-        nextQuestion()
+    internal func initialGame() {
+        
+        score = 0
+        lifeCount = level.defaultLifeByLevel
+        
+        scoreRelay.accept(score)
+        lifeCountRelay.accept(lifeCount)
+        
     }
     
-    func gameOver() {
-        change(toNewState: .gameOver)
-    }
+    internal func generateQuestion() {
 
-    func nextQuestion() {
-
-        guard state != .gameOver, lifeCount != 0 else { return }
+        guard !state.value.isGameOver , lifeCount != 0 else { return }
         
         let question = generateQuestion(level: level, score: score)
-        questionRelay.accept(question)
+        stateOutputRelay.accept(.generated(question: question))
     }
     
-    func answer(isCorrect: Bool) {
+    internal func answer(isCorrect: Bool) {
         
-        guard state != .gameOver, lifeCount != 0 else { return }
+        guard !state.value.isGameOver , lifeCount != 0 else { return }
 
         lifeCount = isCorrect ? lifeCount : lifeCount - 1
         score = isCorrect ? score + 1 : score
@@ -101,18 +112,13 @@ extension RPGameDataSource {
         scoreRelay.accept(score)
         lifeCountRelay.accept(lifeCount)
         
-        nextQuestion()
+        generateQuestion()
         
     }
 
 }
 
 extension RPGameDataSource {
-    
-    private func change(toNewState newState: GameState) {
-        state = newState
-        stateChangeRelay.accept(newState)
-    }
     
     private func generateQuestion(level: Level, score: Int) -> RPQuestion {
         let question = RPQuestion(level: level, score: score)
