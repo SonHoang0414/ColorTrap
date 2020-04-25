@@ -15,6 +15,15 @@ enum Level {
     case hard
     case veryHard
     
+    var defaultLifeByLevel: Int {
+        switch self {
+        case .easy, .medium:
+            return 5
+        case .hard, .veryHard:
+            return 4
+        }
+    }
+    
     // Second calculator
     var limitTimeByLevel: TimeInterval {
         switch self {
